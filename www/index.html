@@ -1,20 +1,11 @@
 <!DOCTYPE html>
 <html>
-<!-- 
-App-o-Mat jQuery Mobile Cordova starter template
-Copyright 2014 Lou Franco
-https://github.com/app-o-mat/jqm-cordova-template-project
-http://app-o-mat.com
-
-MIT License
-https://github.com/app-o-mat/jqm-cordova-template-project/LICENSE.md
--->
 <head>	
 	<meta charset="utf-8">
 	<meta name="format-detection" content="telephone=no" />
 	<meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, target-densitydpi=device-dpi" />
 
-	<title>App-o-Mat</title>
+	<title>Entropy</title>
 
 	<link rel="stylesheet" href="css/index.css">
 	<link rel="stylesheet" href="lib/jquery-mobile/css/jquery.mobile-1.4.0.min.css" />
@@ -26,44 +17,35 @@ https://github.com/app-o-mat/jqm-cordova-template-project/LICENSE.md
 </head>
 
 <body>
+<!--Home Page -->
 <div data-role="page" id="home">
-	<div data-role="header" data-position="fixed">
-		<h1>App-o-Mat</h1><a href="#settings" data-icon="gear" data-transition="slideup" class="ui-btn-right">Settings</a>
-	</div>
-
 	<div role="main" class="ui-content" id="home-content">
-		<h2>Main page</h2>
-		<p><a href="#next" data-transition="slide">Next Page</a></p>
+		<div id="toggle-ac" class="round-button">
+			<div class="round-button-circle">
+				<a href="#">
+					<small>COOLING TO <span id="target_temp">??</span></small>
+					<h1 id="current_temp">??</h1>
+					<span class="state">CONNECTING...</span>
+				</a>
+			</div>
+			<p class="humidity">
+				<span id="current_humidity">??</span>%<br />
+				Humidity
+			</p>
+			<p class="next">
+				Next in schedule: <span id="next_target_temp">??</span> at <span id="next_target_temp_time">??</span>
+			</p>
+		</div>
 	</div>
 </div>
 
-<div data-role="page" id="next">
-	<div data-role="header" data-position="fixed">
-		<h1>Next</h1><a href="#home" data-transition="slide" data-direction="reverse" data-icon="arrow-l" class="ui-btn-left">Home</a>
-	</div>
-
-	<div role="main" class="ui-content">
-	    <h2>Next Page</h2>
-		<p>content</p>
-	</div>
-</div>
-
-<div data-role="page" id="settings">
-	<div data-role="header" data-position="fixed">
-		<h1>Settings</h1><a href="#home" data-transition="slideup" data-direction="reverse" data-icon="check" class="ui-btn-right">Done</a>
-	</div>
-
-	<div role="main" class="ui-content">
-		<h2>Settings</h2>
-	</div>
-</div>
 
 <script type="text/javascript" src="cordova.js"></script>
 <script type="text/javascript" src="lib/fastclick/js/fastclick.js"></script>
 <script type="text/javascript" src="lib/handlebars/js/handlebars-v1.3.0.js"></script>
 
 <script type="text/javascript">
-	appomat.app.initialize();
+	entropy.app.initialize();
 </script>
 
 </body>

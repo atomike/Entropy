@@ -1,51 +1,112 @@
-/*
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- */
-var app = {
-    // Application Constructor
+function celsiusToFarenheit(celsius){
+	var farenheit =  celsius*9/5+32;
+	return farenheit.toFixed(2);
+}
+
+var entropy = {};
+
+entropy.app = {
+	raspberrypi_ip: "192.168.0.142",
+	
     initialize: function() {
-        this.bindEvents();
+		document.addEventListener('deviceready', this.onDeviceReady, false);
     },
-    // Bind Event Listeners
-    //
-    // Bind any events that are required on startup. Common events are:
-    // 'load', 'deviceready', 'offline', and 'online'.
-    bindEvents: function() {
-        document.addEventListener('deviceready', this.onDeviceReady, false);
-    },
-    // deviceready Event Handler
-    //
-    // The scope of 'this' is the event. In order to call the 'receivedEvent'
-    // function, we must explicitly call 'app.receivedEvent(...);'
+
     onDeviceReady: function() {
-        app.receivedEvent('deviceready');
+		console.log("Device Ready");
+		FastClick.attach(document.body);
+		
+		StatusBar.overlaysWebView(false);
+		StatusBar.styleBlackOpaque();
+		StatusBar.backgroundColorByName("black");
+		
+		$("#toggle-ac").on('tap', entropy.app.toggleAC);
+		
+		entropy.app.getACStatus();
+		setInterval(entropy.app.getACStatus, 1000);
     },
-    // Update DOM on a Received Event
-    receivedEvent: function(id) {
-        var parentElement = document.getElementById(id);
-        var listeningElement = parentElement.querySelector('.listening');
-        var receivedElement = parentElement.querySelector('.received');
-
-        listeningElement.setAttribute('style', 'display:none;');
-        receivedElement.setAttribute('style', 'display:block;');
-
-        console.log('Received Event: ' + id);
-    }
+	
+	toggleAC: function(){
+		$("#home").toggleClass("off");
+		
+		if($("#home").hasClass("off"))
+			{entropy.app.turnOFF();}
+		else
+			{entropy.app.turnON();}
+	},
+	
+	turnONSuccess: function(){
+		console.log("Successfully turned AC ON.");
+		$("#home").removeClass("off");
+		$("#toggle-ac span.state").text("TURN OFF");
+	},
+	
+	turnOFFSuccess: function(){
+		console.log("Successfully turned AC OFF.");
+		$("#home").addClass("off");
+		$("#toggle-ac span.state").text("TURN ON");
+	},
+	
+	error: function(){
+		console.error("An error occurred while contacting Raspberry Pi via ajax.");
+		$("#toggle-ac span.state").text("Error");
+	},
+	
+	turnON: function(){
+		console.log("Turning AC ON...");
+		$.ajax({
+		  url: 'http://'+entropy.app.raspberrypi_ip+'/gpio.php',
+		  data: {on:true},
+		  success: entropy.app.turnONSuccess,
+		  error: entropy.app.error
+		});
+	},
+	
+	turnOFF: function(){
+		console.log("Turning AC OFF");
+		$.ajax({
+		  url: 'http://'+entropy.app.raspberrypi_ip+'/gpio.php',
+		  data: {off:true},
+		  success: entropy.app.turnOFFSuccess,
+		  error: entropy.app.error
+		});
+	},
+	
+	getACStatus: function(){
+		console.log("Getting AC Status");
+		$.ajax({
+		  dataType: 'json',
+		  url: 'http://'+entropy.app.raspberrypi_ip+'/gpio.php',
+		  data: {status:true},
+		  success: entropy.app.updateStatus,
+		  error: entropy.app.error
+		});
+	},
+	
+	updateStatus(status){
+		console.log("Updating Status", status);
+		
+		if(status.power=="ON")
+			{entropy.app.turnONSuccess();}
+		else
+			{entropy.app.turnOFFSuccess();}
+		
+		var next_target_temp_time = new Date("1/1/2020 "+status.next_target_temp_time).toLocaleTimeString('en-US');
+		$("#target_temp").text(status.target_temp);
+		$("#next_target_temp").text(status.next_target_temp);
+		$("#next_target_temp_time").text(next_target_temp_time);
+		
+		entropy.app.updateSensorStatus(status.sensor);
+	},
+	
+	updateSensorStatus(sensor){
+		console.log("Updating Sensor Status", sensor);
+		
+		if(sensor==null)
+			{return;}
+		
+		$("#current_temp").text(celsiusToFarenheit(sensor.Temp));
+		$("#current_humidity").text(sensor.RH);
+	}
+	
 };
-
-app.initialize();

@@ -9,6 +9,12 @@
     "installed_plugins": {
         "cordova-plugin-whitelist": {
             "PACKAGE_NAME": "com.entropy.app"
+        },
+        "cordova-plugin-console": {
+            "PACKAGE_NAME": "com.entropy.app"
+        },
+        "cordova-plugin-statusbar": {
+            "PACKAGE_NAME": "com.entropy.app"
         }
     },
     "dependent_plugins": {}
